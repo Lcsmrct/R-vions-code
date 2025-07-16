@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeRoute - Révision du Code de la Route</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .menu-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .quiz-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .question-counter {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .answers {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .answer {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .answer:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .answer.selected {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .answer.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .answer.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-display h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .study-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .study-topic {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .study-topic h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .study-topic ul {
+            padding-left: 20px;
+        }
+
+        .study-topic li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .menu {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .menu-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 CodeRoute</h1>
+            <p>Révisez votre code de la route efficacement</p>
+        </div>
+
+        <div class="main-content">
+            <div class="menu">
+                <button class="menu-btn active" onclick="showSection('quiz')">Quiz</button>
+                <button class="menu-btn" onclick="showSection('study')">Révisions</button>
+                <button class="menu-btn" onclick="showSection('stats')">Statistiques</button>
+            </div>
+
+            <!-- Section Quiz -->
+            <div id="quiz" class="section active">
+                <div class="quiz-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress"></div>
+                    </div>
+                    <div class="question-counter">
+                        Question <span id="current-question">1</span> sur <span id="total-questions">40</span>
+                    </div>
+                    <div class="question" id="question-text"></div>
+                    <div class="answers" id="answers-container"></div>
+                    <div class="quiz-controls">
+                        <button class="btn" id="prev-btn" onclick="previousQuestion()" disabled>Précédent</button>
+                        <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>Suivant</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Révisions -->
+            <div id="study" class="section">
+                <div class="study-section">
+                    <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">📚 Guide de Révision</h2>
+                    
+                    <div class="study-topic">
+                        <h3>🚦 Signalisation</h3>
+                        <ul>
+                            <li>Panneaux d'interdiction (rond, bordure rouge)</li>
+                            <li>Panneaux d'obligation (rond, fond bleu)</li>
+                            <li>Panneaux de danger (triangulaire, bordure rouge)</li>
+                            <li>Panneaux d'indication (carré ou rectangulaire)</li>
+                        </ul>
+                    </div>
+
+                    <div class="study-topic">
+                        <h3>🏃 Priorités</h3>
+                        <ul>
+                            <li>Priorité à droite sauf indication contraire</li>
+                            <li>Respect des feux tricolores</li>
+                            <li>Cédez le passage aux véhicules prioritaires</li>
+                            <li>Priorité aux piétons sur les passages cloutés</li>
+                        </ul>
+                    </div>
+
+                    <div class="study-topic">
+                        <h3>🚗 Stationnement</h3>
+                        <ul>
+                            <li>Interdiction de stationner dans les virages</li>
+                            <li>Respect des zones bleues et payantes</li>
+                            <li>Stationnement interdit devant les garages</li>
+                            <li>Respect des places handicapées</li>
+                        </ul>
+                    </div>
+
+                    <div class="study-topic">
+                        <h3>⚡ Vitesse</h3>
+                        <ul>
+                            <li>50 km/h en agglomération</li>
+                            <li>80 km/h sur route</li>
+                            <li>110 km/h sur voie rapide</li>
+                            <li>130 km/h sur autoroute</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Statistiques -->
+            <div id="stats" class="section">
+                <div class="score-display">
+                    <h2>📊 Vos Statistiques</h2>
+                    <p>Suivez votre progression</p>
+                </div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-answered">0</div>
+                        <div>Questions répondues</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="correct-answers">0</div>
+                        <div>Bonnes réponses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="success-rate">0%</div>
+                        <div>Taux de réussite</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="quizzes-completed">0</div>
+                        <div>Quiz terminés</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 CodeRoute - Révision du Code de la Route</p>
+        </div>
+    </div>
+
+    <script>
+        // Base de données des questions
+        const questions = [
+            {
+                question: "Quelle est la vitesse maximale autorisée en agglomération ?",
+                answers: ["30 km/h", "50 km/h", "60 km/h", "70 km/h"],
+                correct: 1
+            },
+            {
+                question: "À quelle distance minimale devez-vous suivre le véhicule qui vous précède sur autoroute ?",
+                answers: ["2 secondes", "3 secondes", "4 secondes", "5 secondes"],
+                correct: 1
+            },
+            {
+                question: "Que signifie un panneau triangulaire à bordure rouge ?",
+                answers: ["Interdiction", "Obligation", "Danger", "Indication"],
+                correct: 2
+            },
+            {
+                question: "Quand devez-vous allumer vos feux de croisement ?",
+                answers: ["Seulement la nuit", "Par mauvais temps", "Toujours", "En ville uniquement"],
+                correct: 2
+            },
+            {
+                question: "Quelle est la vitesse maximale sur autoroute par temps de pluie ?",
+                answers: ["110 km/h", "120 km/h", "130 km/h", "100 km/h"],
+                correct: 0
+            },
+            {
+                question: "Où est-il interdit de stationner ?",
+                answers: ["Dans un virage", "Devant un garage", "Sur un passage piéton", "Toutes les réponses"],
+                correct: 3
+            },
+            {
+                question: "Que devez-vous faire à un feu orange ?",
+                answers: ["Accélérer", "S'arrêter si possible", "Continuer", "Klaxonner"],
+                correct: 1
+            },
+            {
+                question: "Quelle est la distance d'arrêt approximative à 90 km/h sur route sèche ?",
+                answers: ["45 mètres", "65 mètres", "85 mètres", "105 mètres"],
+                correct: 1
+            },
+            {
+                question: "Quand peut-on dépasser par la droite ?",
+                answers: ["Jamais", "Dans les embouteillages", "En ville", "Sur autoroute"],
+                correct: 1
+            },
+            {
+                question: "Que signifie un panneau rond à fond bleu ?",
+                answers: ["Interdiction", "Obligation", "Danger", "Information"],
+                correct: 1
+            },
+            {
+                question: "À partir de quel taux d'alcoolémie la conduite est-elle interdite ?",
+                answers: ["0,2 g/L", "0,5 g/L", "0,8 g/L", "1,0 g/L"],
+                correct: 1
+            },
+            {
+                question: "Quelle est la vitesse maximale pour un jeune conducteur sur autoroute ?",
+                answers: ["110 km/h", "120 km/h", "130 km/h", "100 km/h"],
+                correct: 0
+            },
+            {
+                question: "Combien de points possède un permis de conduire français ?",
+                answers: ["10 points", "12 points", "15 points", "8 points"],
+                correct: 1
+            },
+            {
+                question: "Que faire en cas de panne sur autoroute ?",
+                answers: ["Rester dans le véhicule", "Sortir côté trafic", "Sortir côté sécurité", "Klaxonner"],
+                correct: 2
+            },
+            {
+                question: "Quelle est la durée du permis probatoire ?",
+                answers: ["1 an", "2 ans", "3 ans", "4 ans"],
+                correct: 2
+            },
+            {
+                question: "À quelle distance doit-on s'arrêter d'un passage à niveau ?",
+                answers: ["3 mètres", "5 mètres", "7 mètres", "10 mètres"],
+                correct: 1
+            },
+            {
+                question: "Que signifie un clignotant qui clignote rapidement ?",
+                answers: ["Batterie faible", "Ampoule grillée", "Problème électrique", "Fonctionnement normal"],
+                correct: 1
+            },
+            {
+                question: "Quelle est la vitesse maximale en zone de rencontre ?",
+                answers: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"],
+                correct: 0
+            },
+            {
+                question: "Combien de temps faut-il garder ses papiers d'assurance ?",
+                answers: ["1 an", "2 ans", "3 ans", "5 ans"],
+                correct: 1
+            },
+            {
+                question: "Que faire si vous êtes ébloui par un véhicule ?",
+                answers: ["Accélérer", "Ralentir", "Klaxonner", "Faire des appels de phares"],
+                correct: 1
+            },
+            {
+                question: "Quelle est la perte de points pour un excès de vitesse de 30 km/h ?",
+                answers: ["2 points", "3 points", "4 points", "6 points"],
+                correct: 1
+            },
+            {
+                question: "Quand utiliser les feux de détresse ?",
+                answers: ["En cas de panne", "Pour doubler", "En ville", "Sur autoroute"],
+                correct: 0
+            },
+            {
+                question: "Quelle est la distance minimale entre deux véhicules à l'arrêt ?",
+                answers: ["1 mètre", "2 mètres", "3 mètres", "Pas de distance"],
+                correct: 0
+            },
+            {
+                question: "Que faire au volant en cas de fatigue ?",
+                answers: ["Boire du café", "Ouvrir la fenêtre", "S'arrêter", "Écouter de la musique"],
+                correct: 2
+            },
+            {
+                question: "Quelle est la vitesse maximale en zone 30 ?",
+                answers: ["25 km/h", "30 km/h", "35 km/h", "40 km/h"],
+                correct: 1
+            },
+            {
+                question: "Quand peut-on utiliser la bande d'arrêt d'urgence ?",
+                answers: ["Pour dépasser", "En cas de panne", "Pour téléphoner", "Pour se reposer"],
+                correct: 1
+            },
+            {
+                question: "Que signifie un panneau carré ou rectangulaire ?",
+                answers: ["Interdiction", "Obligation", "Danger", "Indication"],
+                correct: 3
+            },
+            {
+                question: "Quelle est l'amende pour conduite sans permis ?",
+                answers: ["135 €", "750 €", "1500 €", "3000 €"],
+                correct: 2
+            },
+            {
+                question: "Combien de temps avant l'expiration faut-il renouveler son permis ?",
+                answers: ["3 mois", "6 mois", "1 an", "2 ans"],
+                correct: 1
+            },
+            {
+                question: "Que faire en cas d'aquaplaning ?",
+                answers: ["Freiner fort", "Braquer", "Lever le pied", "Accélérer"],
+                correct: 2
+            },
+            {
+                question: "Quelle est la vitesse maximale sur une route à 3 voies ?",
+                answers: ["80 km/h", "90 km/h", "110 km/h", "130 km/h"],
+                correct: 2
+            },
+            {
+                question: "Quand est-il obligatoire de porter un casque ?",
+                answers: ["En moto", "En scooter", "En vélo (enfant)", "Toutes les réponses"],
+                correct: 3
+            },
+            {
+                question: "Que signifie un feu rouge clignotant ?",
+                answers: ["Arrêt obligatoire", "Prudence", "Priorité", "Fin d'interdiction"],
+                correct: 0
+            },
+            {
+                question: "Quelle est la distance de sécurité par temps de pluie ?",
+                answers: ["Double", "Triple", "Quadruple", "Identique"],
+                correct: 0
+            },
+            {
+                question: "Où placer le triangle de signalisation ?",
+                answers: ["30 mètres", "50 mètres", "100 mètres", "200 mètres"],
+                correct: 0
+            },
+            {
+                question: "Que faire en cas de crevaison sur autoroute ?",
+                answers: ["Changer sur place", "Rouler doucement", "Sortir à la prochaine", "Appeler les secours"],
+                correct: 3
+            },
+            {
+                question: "Quelle est la vitesse maximale d'un cyclomoteur ?",
+                answers: ["25 km/h", "45 km/h", "50 km/h", "60 km/h"],
+                correct: 1
+            },
+            {
+                question: "Combien de temps dure l'examen du permis de conduire ?",
+                answers: ["25 minutes", "32 minutes", "45 minutes", "60 minutes"],
+                correct: 1
+            },
+            {
+                question: "Que faire si vous ratez une sortie d'autoroute ?",
+                answers: ["Faire demi-tour", "Reculer", "Continuer", "S'arrêter"],
+                correct: 2
+            },
+            {
+                question: "Quelle est la sanction pour conduite sous l'emprise de stupéfiants ?",
+                answers: ["Amende", "Suspension", "Prison", "Toutes les réponses"],
+                correct: 3
+            }
+        ];
+
+        // Variables globales
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let score = 0;
+        let stats = {
+            totalAnswered: 0,
+            correctAnswers: 0,
+            quizzesCompleted: 0
+        };
+
+        // Charger les statistiques sauvegardées
+        function loadStats() {
+            const savedStats = JSON.parse(localStorage.getItem('codeRouteStats') || '{}');
+            stats = { ...stats, ...savedStats };
+            updateStatsDisplay();
+        }
+
+        // Sauvegarder les statistiques
+        function saveStats() {
+            localStorage.setItem('codeRouteStats', JSON.stringify(stats));
+        }
+
+        // Initialiser le quiz
+        function initQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            score = 0;
+            displayQuestion();
+            updateProgress();
+        }
+
+        // Afficher la question actuelle
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+            document.getElementById('total-questions').textContent = questions.length;
+
+            const answersContainer = document.getElementById('answers-container');
+            answersContainer.innerHTML = '';
+
+            question.answers.forEach((answer, index) => {
+                const answerElement = document.createElement('div');
+                answerElement.className = 'answer';
+                answerElement.textContent = answer;
+                answerElement.onclick = () => selectAnswer(index);
+                answersContainer.appendChild(answerElement);
+            });
+
+            // Gérer les boutons
+            document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
+            document.getElementById('next-btn').disabled = true;
+        }
+
+        // Sélectionner une réponse
+        function selectAnswer(selectedIndex) {
+            userAnswers[currentQuestionIndex] = selectedIndex;
+            
+            // Retirer la classe selected de toutes les réponses
+            document.querySelectorAll('.answer').forEach(answer => {
+                answer.classList.remove('selected');
+            });
+            
+            // Ajouter la classe selected à la réponse choisie
+            document.querySelectorAll('.answer')[selectedIndex].classList.add('selected');
+            
+            // Activer le bouton suivant
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        // Question suivante
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+                updateProgress();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // Question précédente
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+                updateProgress();
+                
+                // Restaurer la réponse précédente
+                if (userAnswers[currentQuestionIndex] !== undefined) {
+                    const selectedAnswer = document.querySelectorAll('.answer')[userAnswers[currentQuestionIndex]];
+                    selectedAnswer.classList.add('selected');
+                    document.getElementById('next-btn').disabled = false;
+                }
+            }
+        }
+
+        // Mettre à jour la barre de progression
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+
+        // Terminer le quiz
+        function finishQuiz() {
+            // Calculer le score
+            score = 0;
+            for (let i = 0; i < questions.length; i++) {
+                if (userAnswers[i] === questions[i].correct) {
+                    score++;
+                }
+            }
+
+            // Mettre à jour les statistiques
+            stats.totalAnswered += questions.length;
+            stats.correctAnswers += score;
+            stats.quizzesCompleted++;
+            saveStats();
+
+            // Afficher les résultats
+            showResults();
+        }
+
+        // Afficher les résultats
+        function showResults() {
+            const percentage = Math.round((score / questions.length) * 100);
+            let message = '';
+            
+            if (percentage >= 80) {
+                message = '🎉 Excellent ! Vous êtes prêt pour l\'examen !';
+            } else if (percentage >= 60) {
+                message = '👍 Bon travail ! Continuez vos révisions.';
+            } else {
+                message = '📚 Il faut encore réviser. Courage !';
+            }
+
+            document.getElementById('quiz').innerHTML = `
+                <div class="score-display">
+                    <h2>🏆 Résultats</h2>
+                    <div style="font-size: 3rem; margin: 20px 0;">${score}/${questions.length}</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 10px;">${percentage}%</div>
+                    <p style="font-size: 1.2rem;">${message}</p>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="location.reload()">Recommencer</button>
+                </div>
+            `;
+        }
+
+        // Afficher une section
+        function showSection(sectionName) {
+            // Masquer toutes les sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Afficher la section demandée
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Mettre à jour les boutons du menu
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Mettre à jour les statistiques si nécessaire
+            if (sectionName === 'stats') {
+                updateStatsDisplay();
+            }
+        }
+
+        // Mettre à jour l'affichage des statistiques
+        function updateStatsDisplay() {
+            document.getElementById('total-answered').textContent = stats.totalAnswered;
+            document.getElementById('correct-answers').textContent = stats.correctAnswers;
+            document.getElementById('quizzes-completed').textContent = stats.quizzesCompleted;
+            
+            const successRate = stats.totalAnswered > 0 ? 
+                Math.round((stats.correctAnswers / stats.totalAnswered) * 100) : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        }
+
+        // Initialiser l'application
+        window.onload = function() {
+            loadStats();
+            initQuiz();
+        };
+    </script>
+</body>
+</html>
